@@ -239,7 +239,7 @@ network_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 print "Installing the base system (it may take a while)."
-pacstrap /mnt base $kernel $microcode linux-firmware $kernel-headers btrfs-progs grub grub-btrfs rsync efibootmgr snapper reflector base-devel snap-pac zram-generator
+pacstrap /mnt base $kernel $microcode linux-firmware $kernel-headers refind btrfs-progs rsync efibootmgr snapper reflector base-devel snap-pac zram-generator
 
 # Setting up the hostname.
 hostname_selector
@@ -272,8 +272,8 @@ HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt fil
 COMPRESSION=(zstd)
 EOF
 
-# Setting up LUKS2 encryption in grub.
-print "Setting up grub config."
+# Setting up LUKS2 encryption in rEFInd.
+print "Setting up rEFInd config."
 UUID=$(blkid -s UUID -o value $CRYPTROOT)
 sed -i "s,quiet,quiet rd.luks.name=$UUID=cryptroot root=$BTRFS,g" /mnt/etc/default/grub
 
@@ -305,15 +305,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
     mkdir /.snapshots
     mount -a
     chmod 750 /.snapshots
-    
-    # Installing GRUB.
-    echo "Installing GRUB on /boot."
-    grub-install --target=x86_64-efi --efi-directory=/boot/ --bootloader-id=GRUB &>/dev/null
-
-    # Creating grub config file.
-    echo "Creating GRUB config file."
-    grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
-
 EOF
 
 # Setting root password.
