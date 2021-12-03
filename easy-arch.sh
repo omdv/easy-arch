@@ -326,9 +326,9 @@ cat > /mnt/boot/EFI/refind/refind.conf <<EOF
 menuentry "Arch Linux" {
 	icon     /EFI/refind/icons/os_arch.png
 	volume   "Arch Linux"
-	loader   /@/boot/vmlinuz-linux
-	initrd   /@/boot/initramfs-linux.img
-    initrd   /@/boot/amd-ucode.img
+	loader   /boot/vmlinuz-linux
+	initrd   /boot/initramfs-linux.img
+    initrd   /boot/amd-ucode.img
 	options  "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet"
 	submenuentry "Boot to terminal (rescue mode)" {
 		add_options "systemd.unit=multi-user.target"
