@@ -16,7 +16,7 @@
 3. Boot the live environment
 4. Set the keyboard layout by using `loadkeys <kblayout>`
 5. Connect to the internet
-6. Run this `bash <(curl -sL bit.ly/easy-arch)`
+6. Run this `bash <(curl -sL bit.ly/easy-arch-exp)`
 
 ### Partitions layout 
 
