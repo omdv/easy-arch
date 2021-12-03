@@ -302,7 +302,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     chmod 750 /.snapshots
 
     # rEFInd installation.
-    echo
+    echo "Installing rEFInd."
     refind-install &>/dev/null
 EOF
 
