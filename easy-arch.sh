@@ -329,7 +329,7 @@ cat > /mnt/boot/refind_linux.conf <<EOF
 "Boot to terminal"              "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=\\$microcode.img initrd=\initramfs-$kernel.img systemd.unit=multi-user.target"
 EOF
 
-# Boot backup hook.
+# Setting up pacman hooks.
 print "Configuring /boot backup when pacman transactions are made."
 mkdir /mnt/etc/pacman.d/hooks
 cat > /mnt/etc/pacman.d/hooks/50-bootbackup.hook <<EOF
@@ -345,6 +345,19 @@ Depends = rsync
 Description = Backing up /boot...
 When = PostTransaction
 Exec = /usr/bin/rsync -a --delete /boot /.bootbackup
+EOF
+
+print "Configuring rEFInd when rEFInd is updated."
+cat > /mnt/etc/pacman.d/hooks/50-bootbackup.hook <<EOF
+[Trigger]
+Operation=Upgrade
+Type=Package
+Target=refind
+
+[Action]
+Description = Updating rEFInd on ESP
+When=PostTransaction
+Exec=/usr/bin/refind-install
 EOF
 
 # ZRAM configuration.
