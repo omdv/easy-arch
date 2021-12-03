@@ -275,8 +275,9 @@ EOF
 # Setting up LUKS2 encryption in rEFInd.
 print "Setting up rEFInd config."
 UUID=$(blkid -s UUID -o value $CRYPTROOT)
-sed -i "s,quiet,quiet rd.luks.name=$UUID=cryptroot root=$BTRFS,g" /mnt/etc/default/grub
-
+cat > /mnt/boot/refind.conf <<EOF
+"Boot using standard options"  "quiet rd.luks.name=$UUID=cryptroot root=$BTRFS rw rootflags=subvol=@ initrd=@\boot\initramfs-%v.img"
+EOF
 # Configuring the system.    
 arch-chroot /mnt /bin/bash -e <<EOF
 
