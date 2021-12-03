@@ -239,7 +239,7 @@ network_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 print "Installing the base system (it may take a while)."
-pacstrap /mnt base $kernel $microcode linux-firmware $kernel-headers refind btrfs-progs rsync efibootmgr snapper reflector base-devel snap-pac zram-generator
+pacstrap /mnt base $kernel $microcode linux-firmware $kernel-headers refind btrfs-progs rsync snapper reflector base-devel snap-pac zram-generator
 
 # Setting up the hostname.
 hostname_selector
@@ -272,12 +272,6 @@ HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt fil
 COMPRESSION=(zstd)
 EOF
 
-# Setting up LUKS2 encryption in rEFInd.
-print "Setting up rEFInd config."
-UUID=$(blkid -s UUID -o value $CRYPTROOT)
-cat > /mnt/boot/refind.conf <<EOF
-"Boot using standard options"  "quiet rd.luks.name=$UUID=cryptroot root=$BTRFS rw rootflags=subvol=@ initrd=@\boot\initramfs-%v.img"
-EOF
 # Configuring the system.    
 arch-chroot /mnt /bin/bash -e <<EOF
 
@@ -306,6 +300,9 @@ arch-chroot /mnt /bin/bash -e <<EOF
     mkdir /.snapshots
     mount -a
     chmod 750 /.snapshots
+
+    # rEFInd installation.
+    refind-install
 EOF
 
 # Setting root password.
@@ -321,6 +318,23 @@ if [ -n "$username" ]; then
     print "Setting user password for $username." 
     arch-chroot /mnt /bin/passwd "$username"
 fi
+
+# Setting up rEFInd.
+print "Setting up rEFInd config."
+UUID=$(blkid -s UUID -o value $CRYPTROOT)
+cat > /mnt/boot/EFI/refind/refind.conf <<EOF
+menuentry "Arch Linux" {
+	icon     /EFI/refind/icons/os_arch.png
+	volume   "Arch Linux"
+	loader   /@/boot/vmlinuz-linux
+	initrd   /@/boot/initramfs-linux.img
+    initrd   /@/boot/amd-ucode.img
+	options  "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet"
+	submenuentry "Boot to terminal (rescue mode)" {
+		add_options "systemd.unit=multi-user.target"
+	}
+}
+EOF
 
 # Boot backup hook.
 print "Configuring /boot backup when pacman transactions are made."
