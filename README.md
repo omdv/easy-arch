@@ -4,7 +4,7 @@
 
 ### Introduction
 [easy-arch](https://github.com/classy-giraffe/easy-arch) is a **bash script** made in order to boostrap a basic but modern **Arch Linux** environment, with a few cherry-picked  features:
-1. BTRFS bootable snapshots from GRUB
+1. BTRFS bootable snapshots from rEFInd
 2. LUKS2 encryption
 3. [ZRAM](https://fedoraproject.org/wiki/Changes/SwapOnZRAM) as swap
 4. [systemd-oomd](https://fedoraproject.org/wiki/Changes/EnableSystemdOomd)
