@@ -324,9 +324,9 @@ fi
 print "Setting up rEFInd config."
 UUID=$(blkid -s UUID -o value $CRYPTROOT)
 cat > /mnt/boot/refind_linux.conf <<EOF
-"Boot using default options"    "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=\$microcode.img initrd=\initramfs-$kernel.img"
-"Boot using fallback initramfs" "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=\$microcode.img initrd=\initramfs-$kernel-fallback.img"
-"Boot to terminal"              "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=\$microcode.img initrd=\initramfs-$kernel.img systemd.unit=multi-user.target"
+"Boot using default options"    "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=\\$microcode.img initrd=\initramfs-$kernel.img"
+"Boot using fallback initramfs" "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=\\$microcode.img initrd=\initramfs-$kernel-fallback.img"
+"Boot to terminal"              "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=\\$microcode.img initrd=\initramfs-$kernel.img systemd.unit=multi-user.target"
 EOF
 
 # Boot backup hook.
@@ -359,7 +359,7 @@ EOF
 print "Enabling Reflector, automatic snapshots, BTRFS scrubbing and systemd-oomd."
 for service in reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var-log.timer btrfs-scrub@\\x2esnapshots.timer systemd-oomd
 do
-    systemctl enable $service --root=/mnt &>/dev/null
+    systemctl enable "$service" --root=/mnt &>/dev/null
 done
 
 # Finishing up.
