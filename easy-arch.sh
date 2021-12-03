@@ -302,7 +302,8 @@ arch-chroot /mnt /bin/bash -e <<EOF
     chmod 750 /.snapshots
 
     # rEFInd installation.
-    refind-install
+    echo
+    refind-install &>/dev/null
 EOF
 
 # Setting root password.
@@ -322,18 +323,10 @@ fi
 # Setting up rEFInd.
 print "Setting up rEFInd config."
 UUID=$(blkid -s UUID -o value $CRYPTROOT)
-cat > /mnt/boot/EFI/refind/refind.conf <<EOF
-menuentry "Arch Linux" {
-	icon     /EFI/refind/icons/os_arch.png
-	volume   "Arch Linux"
-	loader   /vmlinuz-linux
-    initrd   /initramfs-linux.img
-    initrd   /amd-ucode.img
-	options  "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=/amd-ucode.img"
-	submenuentry "Boot to terminal (rescue mode)" {
-		add_options "systemd.unit=multi-user.target"
-	}
-}
+cat > /mnt/boot/refind_linux.conf <<EOF
+"Boot using default options"    "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=\$microcode.img initrd=\initramfs-$kernel.img"
+"Boot using fallback initramfs" "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=\$microcode.img initrd=\initramfs-$kernel-fallback.img"
+"Boot to terminal"              "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=\$microcode.img initrd=\initramfs-$kernel.img systemd.unit=multi-user.target"
 EOF
 
 # Boot backup hook.
