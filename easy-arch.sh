@@ -239,7 +239,7 @@ network_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 print "Installing the base system (it may take a while)."
-pacstrap /mnt base $kernel $microcode linux-firmware $kernel-headers refind btrfs-progs rsync snapper reflector base-devel snap-pac zram-generator
+pacstrap /mnt base $kernel $microcode $kernel-headers linux-firmware refind btrfs-progs rsync snapper reflector base-devel snap-pac zram-generator
 
 # Setting up the hostname.
 hostname_selector
@@ -326,10 +326,10 @@ cat > /mnt/boot/EFI/refind/refind.conf <<EOF
 menuentry "Arch Linux" {
 	icon     /EFI/refind/icons/os_arch.png
 	volume   "Arch Linux"
-	loader   /boot/vmlinuz-linux
-    initrd   /boot/initramfs-linux.img
-    initrd   /boot/amd-ucode.img
-	options  "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet"
+	loader   /vmlinuz-linux
+    initrd   /initramfs-linux.img
+    initrd   /amd-ucode.img
+	options  "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=/amd-ucode.img"
 	submenuentry "Boot to terminal (rescue mode)" {
 		add_options "systemd.unit=multi-user.target"
 	}
