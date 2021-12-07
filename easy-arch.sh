@@ -114,18 +114,6 @@ password_selector () {
     BTRFS="/dev/mapper/cryptroot"
 }
 
-# Microcode detector (function).
-microcode_detector () {
-    CPU=$(grep vendor_id /proc/cpuinfo)
-    if [[ $CPU == *"AuthenticAMD"* ]]; then
-        print "An AMD CPU has been detected, the AMD microcode will be installed."
-        microcode="amd-ucode"
-    else
-        print "An Intel CPU has been detected, the Intel microcode will be installed."
-        microcode="intel-ucode"
-    fi
-}
-
 # Setting up the hostname (function).
 hostname_selector () {
     read -r -p "Please enter the hostname: " hostname
@@ -228,8 +216,15 @@ mount $ESP /mnt/boot/
 # Setting up the kernel.
 kernel_selector
 
-# Checking the microcode to install.
-microcode_detector
+# Microcode detector
+CPU=$(grep vendor_id /proc/cpuinfo)
+if [[ $CPU == *"AuthenticAMD"* ]]; then
+    print "An AMD CPU has been detected, the AMD microcode will be installed."
+    microcode="amd-ucode"
+else
+    print "An Intel CPU has been detected, the Intel microcode will be installed."
+    microcode="intel-ucode"
+fi
 
 # Virtualization check.
 virt_check
@@ -239,7 +234,7 @@ network_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 print "Installing the base system (it may take a while)."
-pacstrap /mnt base $kernel $microcode $kernel-headers linux-firmware refind btrfs-progs rsync snapper reflector base-devel snap-pac zram-generator
+pacstrap /mnt base "$kernel" "$microcode" "$kernel-headers" linux-firmware refind btrfs-progs rsync snapper reflector base-devel snap-pac zram-generator
 
 # Setting up the hostname.
 hostname_selector
