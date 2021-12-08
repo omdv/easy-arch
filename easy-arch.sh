@@ -325,8 +325,8 @@ use_nvram false
 menuentry "Arch Linux" {
 	icon     /EFI/refind/icons/os_arch.png
 	volume   "Arch Linux"
-	loader   /vmlinuz-linux
-    initrd   /initramfs-linux.img
+	loader   /vmlinuz-$kernel
+    initrd   /initramfs-$kernel.img
 	options  "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ quiet initrd=\\$microcode.img initrd=\initramfs-$kernel.img"
 	submenuentry "Boot to terminal (rescue mode)" {
 		add_options "systemd.unit=multi-user.target"
