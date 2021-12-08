@@ -309,7 +309,8 @@ arch-chroot /mnt /bin/passwd
 # Setting user password.
 if [ -n "$username" ]; then
     print "Adding $username with root privilege."
-    useradd -m -G wheel -s /bin/bash "$username"
+    arch-chroot /mnt useradd -m -G wheel -s /bin/bash "$username"
+    sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /mnt/etc/sudoers
     print "Setting user password for $username." 
     arch-chroot /mnt /bin/passwd "$username"
 fi
