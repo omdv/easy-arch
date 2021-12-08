@@ -309,9 +309,7 @@ arch-chroot /mnt /bin/passwd
 # Setting user password.
 if [ -n "$username" ]; then
     print "Adding $username with root privilege."
-    useradd -m "$username"
-    usermod -aG wheel "$username"
-    echo "$username ALL=(ALL) ALL" >> /etc/sudoers.d/"$username"
+    useradd -m -G wheel -s /bin/bash "$username"
     print "Setting user password for $username." 
     arch-chroot /mnt /bin/passwd "$username"
 fi
@@ -327,9 +325,8 @@ menuentry "Arch Linux" {
 	icon     /EFI/refind/icons/os_arch.png
 	volume   "Arch Linux"
 	loader   /vmlinuz-linux
-    initrd   /amd-ucode.img
     initrd   /initramfs-linux.img
-	options  "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ quiet initrd=/amd-ucode.img"
+	options  "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ quiet initrd=\\$microcode.img initrd=\initramfs-$kernel.img"
 	submenuentry "Boot to terminal (rescue mode)" {
 		add_options "systemd.unit=multi-user.target"
 	}
