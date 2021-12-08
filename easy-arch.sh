@@ -205,12 +205,12 @@ done
 # Mounting the newly created subvolumes.
 umount /mnt
 print "Mounting the newly created subvolumes."
-mount -o ssd,noatime,space_cache=v2,compress-force=zstd:15,discard=async,subvol=@ $BTRFS /mnt
+mount -o ssd,noatime,compress-force=zstd:15,discard=async,subvol=@ $BTRFS /mnt
 mkdir -p /mnt/{home,.snapshots,/var/log,/var/cache/pacman/pkg,boot}
-mount -o ssd,noatime,space_cache=v2,compress-force=zstd:15,discard=async,subvol=@home $BTRFS /mnt/home
-mount -o ssd,noatime,space_cache=v2,compress-force=zstd:15,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
-mount -o ssd,noatime,space_cache=v2,compress-force=zstd:15,discard=async,subvol=@var_log $BTRFS /mnt/var/log
-mount -o ssd,noatime,space_cache=v2,compress-force=zstd:15,discard=async,subvol=@var_pkgs $BTRFS /mnt/var/cache/pacman/pkg
+mount -o ssd,noatime,compress-force=zstd:15,discard=async,subvol=@home $BTRFS /mnt/home
+mount -o ssd,noatime,compress-force=zstd:15,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
+mount -o ssd,noatime,compress-force=zstd:15,discard=async,subvol=@var_log $BTRFS /mnt/var/log
+mount -o ssd,noatime,compress-force=zstd:15,discard=async,subvol=@var_pkgs $BTRFS /mnt/var/cache/pacman/pkg
 chattr +C /mnt/var/log
 mount $ESP /mnt/boot/
 
