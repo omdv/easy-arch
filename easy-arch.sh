@@ -317,12 +317,23 @@ if [ -n "$username" ]; then
 fi
 
 # Setting up rEFInd.
-print "Setting up rEFInd config."
+print "Setting up rEFInd configuration file."
 UUID=$(blkid -s UUID -o value $CRYPTROOT)
-cat > /mnt/boot/refind_linux.conf <<EOF
-"Boot using default options"    "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=\\$microcode.img initrd=\initramfs-$kernel.img"
-"Boot using fallback initramfs" "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=\\$microcode.img initrd=\initramfs-$kernel-fallback.img"
-"Boot to terminal"              "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ rw quiet initrd=\\$microcode.img initrd=\initramfs-$kernel.img systemd.unit=multi-user.target"
+rm -rf /mnt/boot/refind_linux.conf
+cat > /mnt/boot/EFI/refind/refind.conf <<EOF
+timeout 20
+use_nvram false
+menuentry "Arch Linux" {
+	icon     /EFI/refind/icons/os_arch.png
+	volume   "Arch Linux"
+	loader   /vmlinuz-linux
+    initrd   /amd-ucode.img
+    initrd   /initramfs-linux.img
+	options  "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ quiet initrd=/amd-ucode.img"
+	submenuentry "Boot to terminal (rescue mode)" {
+		add_options "systemd.unit=multi-user.target"
+	}
+}
 EOF
 
 # Setting up pacman hooks.
