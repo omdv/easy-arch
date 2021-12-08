@@ -242,7 +242,7 @@ network_selector
 
 # Pacstrap (setting up a base sytem onto the new root).
 print "Installing the base system (it may take a while)."
-pacstrap /mnt base "$kernel" "$microcode" "$kernel-headers" linux-firmware refind btrfs-progs rsync snapper reflector base-devel snap-pac zram-generator
+pacstrap /mnt base "$kernel" "$microcode" "$kernel-headers" linux-firmware refind btrfs-progs rsync snapper reflector base-devel snap-pac zram-generator git
 
 # Setting up the hostname.
 hostname_selector
@@ -321,6 +321,11 @@ if [ -n "$username" ]; then
     print "Setting user password for $username." 
     arch-chroot /mnt /bin/passwd "$username"
 fi
+
+# Install AUR.
+git clone https://aur.archlinux.org/yay.git /mnt/home/tommy/yay
+arch-chroot /mnt su - tommy -c "makepkg -si --noconfirm /mnt/home/tommy/yay"
+arch-chroot /mnt su - tommy -c "yay -S refind-btrfs"
 
 # Setting up rEFInd.
 print "Setting up rEFInd configuration file."
