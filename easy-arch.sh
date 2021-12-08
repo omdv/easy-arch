@@ -52,13 +52,17 @@ kernel_selector () {
     print "4) Zen: A Linux kernel optimized for desktop usage"
     read -r -p "Insert the number of the corresponding kernel: " choice
     case $choice in
-        1 ) kernel="linux"
+        1 ) print "linux will be installed."
+            kernel="linux"
             ;;
-        2 ) kernel="linux-hardened"
+        2 ) print "linux-hardened will be installed."
+            kernel="linux-hardened"
             ;;
-        3 ) kernel="linux-lts"
+        3 ) print "linux-lts will be installed."
+            kernel="linux-lts"
             ;;
-        4 ) kernel="linux-zen"
+        4 ) print "linux-zen will be installed."
+            kernel="linux-zen"
             ;;
         * ) print "You did not enter a valid selection."
             kernel_selector
@@ -121,6 +125,7 @@ hostname_selector () {
         print "You need to enter a hostname in order to continue."
         hostname_selector
     fi
+    print "$hostname will be used as hostname."
     echo "$hostname" > /mnt/etc/hostname
 }
 
@@ -131,6 +136,7 @@ locale_selector () {
         print "en_US will be used as default locale."
         locale="en_US"
     fi
+    print "$locale will be used as locale."
     echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
     echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
 }
@@ -142,6 +148,7 @@ keyboard_selector () {
         print "US keyboard layout will be used by default."
         kblayout="us"
     fi
+    print "$kblayout will be used as keyboard layout."
     echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 }
 
