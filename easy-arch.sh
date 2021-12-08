@@ -192,14 +192,14 @@ password_selector
 
 # Formatting the LUKS Container as BTRFS.
 print "Formatting the LUKS container as BTRFS."
-mkfs.btrfs $BTRFS &>/dev/null
+mkfs.btrfs $BTRFS
 mount $BTRFS /mnt
 
 # Creating BTRFS subvolumes.
 print "Creating BTRFS subvolumes."
 for volume in @ @home @snapshots @var_log @var_pkgs
 do
-    btrfs su cr /mnt/$volume &>/dev/null
+    btrfs su cr /mnt/$volume
 done
 
 # Mounting the newly created subvolumes.
