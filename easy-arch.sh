@@ -129,6 +129,20 @@ hostname_selector () {
     echo "$hostname" > /mnt/etc/hostname
 }
 
+# Setting up a user account
+account_creator () {
+    read -r -p "Please enter name for a user account: " username
+    if [ -z "$username" ]; then
+        print "You need to enter a valid username in order to continue."
+        account_creator
+    fi
+    print "Adding the user $username to the system with root privilege."
+    arch-chroot /mnt useradd -m -G wheel -s /bin/bash "$username"
+    sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /mnt/etc/sudoers
+    print "Setting user password for $username." 
+    arch-chroot /mnt /bin/passwd "$username"
+}
+
 # Setting up the locale (function).
 locale_selector () {
     read -r -p "Please insert the locale you use (format: xx_XX or enter empty to use en_US): " locale
@@ -252,7 +266,7 @@ print "Generating a new fstab."
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Setting username.
-read -r -p "Please enter name for a user account (enter empty to not create one): " username
+read -r -p "Please enter name for a user account: " username
 
 # Setting up the locale.
 locale_selector
@@ -313,18 +327,8 @@ EOF
 print "Setting root password."
 arch-chroot /mnt /bin/passwd
 
-# Setting user password.
-if [ -n "$username" ]; then
-    print "Adding the user $username to the system with root privilege."
-    arch-chroot /mnt useradd -m -G wheel -s /bin/bash "$username"
-    sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /mnt/etc/sudoers
-    print "Setting user password for $username." 
-    arch-chroot /mnt /bin/passwd "$username"
-fi
-
 # Install AUR.
-arch-chroot /mnt su - tommy -c "git clone https://aur.archlinux.org/yay.git"
-arch-chroot /mnt su - tommy -c "cd yay && makepkg --noconfirm"
+arch-chroot /mnt sudo -H -u "$username" -c "git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si --noconfirm"
 
 # Setting up rEFInd.
 print "Setting up rEFInd configuration file."
