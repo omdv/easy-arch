@@ -323,9 +323,8 @@ if [ -n "$username" ]; then
 fi
 
 # Install AUR.
-git clone https://aur.archlinux.org/yay.git /mnt/home/tommy/yay
-arch-chroot /mnt su - tommy -c "makepkg -si --noconfirm /mnt/home/tommy/yay"
-arch-chroot /mnt su - tommy -c "yay -S refind-btrfs"
+arch-chroot /mnt su - tommy -c "git clone https://aur.archlinux.org/yay.git"
+arch-chroot /mnt su - tommy -c "cd yay && makepkg --noconfirm"
 
 # Setting up rEFInd.
 print "Setting up rEFInd configuration file."
