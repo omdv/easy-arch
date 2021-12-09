@@ -266,7 +266,7 @@ print "Generating a new fstab."
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Setting username.
-read -r -p "Please enter name for a user account: " username
+account_creator
 
 # Setting up the locale.
 locale_selector
