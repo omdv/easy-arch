@@ -327,9 +327,6 @@ EOF
 print "Setting root password."
 arch-chroot /mnt /bin/passwd
 
-# Install AUR.
-arch-chroot /mnt sudo -H -u "$username" bash -c "git clone https://aur.archlinux.org/paru.git /home/$username/paru && cd /home/$username/paru && makepkg -si --noconfirm"
-
 # Setting up rEFInd.
 print "Setting up rEFInd configuration file."
 UUID=$(blkid -s UUID -o value $CRYPTROOT)
@@ -348,8 +345,9 @@ menuentry "Arch Linux" {
 	}
 }
 EOF
-print "Installing rEFInd-btrfs."
-arch-chroot /mnt paru -S --noconfirm refind-btrfs
+
+# Install AUR and rEFInd-btrfs.
+arch-chroot /mnt sudo -H -u "$username" bash -c "git clone https://aur.archlinux.org/paru.git /home/$username/paru && cd /home/$username/paru && makepkg -si --noconfirm && paru -S --noconfirm refind-btrfs"
 
 # Setting up pacman hooks.
 print "Configuring /boot backup when pacman transactions are made."
@@ -392,7 +390,7 @@ EOF
 
 # Pacman eye-candy features.
 print "Enabling colours and animations in pacman."
-sed -i 's/#Colors/Colors\nILoveCandy/' /mnt/etc/pacman.conf
+sed -i 's/#Color/Color\nILoveCandy/' /mnt/etc/pacman.conf
 
 # Enabling various services.
 print "Enabling Reflector, automatic snapshots, BTRFS scrubbing, rEFInd-btrfs and systemd-oomd."
