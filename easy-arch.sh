@@ -328,7 +328,7 @@ print "Setting root password."
 arch-chroot /mnt /bin/passwd
 
 # Install AUR.
-arch-chroot /mnt sudo -H -u "$username" -c "git clone https://aur.archlinux.org/paru.git && cd paru && makepkg -si --noconfirm"
+arch-chroot /mnt sudo -H -u "$username" bash -c "git clone https://aur.archlinux.org/paru.git /home/$username/paru && cd /home/$username/paru && makepkg -si --noconfirm"
 
 # Setting up rEFInd.
 print "Setting up rEFInd configuration file."
@@ -348,6 +348,8 @@ menuentry "Arch Linux" {
 	}
 }
 EOF
+print "Installing rEFInd-btrfs."
+arch-chroot /mnt paru -S --noconfirm refind-btrfs
 
 # Setting up pacman hooks.
 print "Configuring /boot backup when pacman transactions are made."
@@ -393,8 +395,8 @@ print "Enabling colours and animations in pacman."
 sed -i 's/#Colors/Colors\nILoveCandy/' /mnt/etc/pacman.conf
 
 # Enabling various services.
-print "Enabling Reflector, automatic snapshots, BTRFS scrubbing and systemd-oomd."
-for service in reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var-log.timer btrfs-scrub@\\x2esnapshots.timer systemd-oomd
+print "Enabling Reflector, automatic snapshots, BTRFS scrubbing, rEFInd-btrfs and systemd-oomd."
+for service in reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var-log.timer btrfs-scrub@\\x2esnapshots.timer refind-btrfs systemd-oomd
 do
     systemctl enable "$service" --root=/mnt &>/dev/null
 done
