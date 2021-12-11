@@ -338,16 +338,20 @@ menuentry "Arch Linux" {
 	icon     /EFI/refind/icons/os_arch.png
 	volume   "Arch Linux"
 	loader   /vmlinuz-$kernel
-    initrd   /initramfs-$kernel.img
+	initrd   /initramfs-$kernel.img
 	options  "rd.luks.name=$UUID=cryptroot root=$BTRFS rootflags=subvol=@ quiet initrd=\\$microcode.img initrd=\initramfs-$kernel.img"
 	submenuentry "Boot to terminal (rescue mode)" {
-		add_options "systemd.unit=multi-user.target"
+	    add_options "systemd.unit=multi-user.target"
 	}
 }
 EOF
 
 # Install AUR and rEFInd-btrfs.
-arch-chroot /mnt sudo -H -u "$username" bash -c "git clone https://aur.archlinux.org/paru.git /home/$username/paru && cd /home/$username/paru && makepkg -si --noconfirm && paru -S --noconfirm refind-btrfs"
+arch-chroot /mnt sudo -H -u "$username" bash -c "
+    git clone https://aur.archlinux.org/paru.git /home/$username/paru && 
+    cd /home/$username/paru && makepkg -si --noconfirm && 
+    paru -S --noconfirm refind-btrfs
+"
 
 # Setting up pacman hooks.
 print "Configuring /boot backup when pacman transactions are made."
