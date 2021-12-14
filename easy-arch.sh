@@ -209,7 +209,7 @@ mount $BTRFS /mnt
 
 # Creating BTRFS subvolumes.
 print "Creating BTRFS subvolumes."
-for volume in @ @home @snapshots @var_log @var_pkgs
+for volume in @ @home @snapshots @var_log @var_pkgs swap
 do
     btrfs su cr /mnt/$volume
 done
@@ -223,8 +223,24 @@ mount -o ssd,noatime,compress-force=zstd:3,discard=async,subvol=@home $BTRFS /mn
 mount -o ssd,noatime,compress-force=zstd:3,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,compress-force=zstd:3,discard=async,subvol=@var_log $BTRFS /mnt/var/log
 mount -o ssd,noatime,compress-force=zstd:3,discard=async,subvol=@var_pkgs $BTRFS /mnt/var/cache/pacman/pkg
+mount -o ssd,relatime,space_cache,subvol=swap $BTRFS /mnt/swap
 chattr +C /mnt/var/log
 mount $ESP /mnt/boot/
+
+# Set up swap file
+MEMSIZE=$(awk '/^Mem/ {print $2}' <(free -m))
+FILESIZE=$(($MEMSIZE + 1000))
+print "RAM size = $MEMSIZE"
+print "Swap file size = $FILESIZE"
+
+truncate -s 0 /mnt/swap/swapfile
+chattr +C /mnt/swap/swapfile
+btrfs property set /mnt/swap/swapfile compression none
+
+dd if=/dev/zero of=/mnt/swap/swapfile bs=1M count=$FILESIZE status=progress
+chmod 600 /mnt/swap/swapfile
+#mkswap /mnt/swap/swapfile
+#swapon /mnt/swap/swapfile
 
 # Setting up the kernel.
 kernel_selector
@@ -269,7 +285,7 @@ EOF
 # Configuring /etc/mkinitcpio.conf.
 print "Configuring /etc/mkinitcpio.conf."
 cat > /mnt/etc/mkinitcpio.conf <<EOF
-HOOKS=(base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt filesystems)
+HOOKS=(base udev systemd autodetect keyboard sd-vconsole modconf block sd-encrypt filesystems resume)
 COMPRESSION=(zstd)
 EOF
 
@@ -349,12 +365,12 @@ Exec = /usr/bin/rsync -a --delete /boot /.bootbackup
 EOF
 
 # ZRAM configuration.
-print "Configuring ZRAM."
-cat > /mnt/etc/systemd/zram-generator.conf <<EOF
-[zram0]
-zram-fraction = 1
-max-zram-size = 8192
-EOF
+#print "Configuring ZRAM."
+#cat > /mnt/etc/systemd/zram-generator.conf <<EOF
+#[zram0]
+#zram-fraction = 1
+#max-zram-size = 8192
+#EOF
 
 # Pacman eye-candy features.
 print "Enabling colours and animations in pacman."
