@@ -218,7 +218,7 @@ done
 umount /mnt
 print "Mounting the newly created subvolumes."
 mount -o ssd,noatime,compress-force=zstd:3,discard=async,subvol=@ $BTRFS /mnt
-mkdir -p /mnt/{home,.snapshots,/var/log,/var/cache/pacman/pkg,boot}
+mkdir -p /mnt/{home,.snapshots,/var/log,/var/cache/pacman/pkg,boot,swap}
 mount -o ssd,noatime,compress-force=zstd:3,discard=async,subvol=@home $BTRFS /mnt/home
 mount -o ssd,noatime,compress-force=zstd:3,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,compress-force=zstd:3,discard=async,subvol=@var_log $BTRFS /mnt/var/log
@@ -239,8 +239,10 @@ btrfs property set /mnt/swap/swapfile compression none
 
 dd if=/dev/zero of=/mnt/swap/swapfile bs=1M count=$FILESIZE status=progress
 chmod 600 /mnt/swap/swapfile
-#mkswap /mnt/swap/swapfile
-#swapon /mnt/swap/swapfile
+mkswap /mnt/swap/swapfile
+swapon /mnt/swap/swapfile
+
+sleep 5s
 
 # Setting up the kernel.
 kernel_selector
